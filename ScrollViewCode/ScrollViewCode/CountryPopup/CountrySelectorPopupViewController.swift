@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class CountrySelectorPopupViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class CountrySelectorPopupViewController: UIViewController {
     
     // MARK: - Data and State
     
@@ -78,7 +78,7 @@ class CountrySelectorPopupViewController: UIViewController, UITableViewDataSourc
     override func viewDidLayoutSubviews() {
             super.viewDidLayoutSubviews()
             // Ensure rounding mask is applied after the final layout size is determined
-            roundCorners(of: popupContainer, corners: [.topLeft, .topRight], radius: 15)
+        roundCorners(of: popupContainer, corners: [.topLeft, .topRight, .bottomLeft, .bottomRight], radius: 15)
         }
     
     // MARK: - Layout Setup
@@ -121,7 +121,23 @@ class CountrySelectorPopupViewController: UIViewController, UITableViewDataSourc
         ])
     }
     
-    // MARK: - Table View Data Source and Delegate
+    // MARK: - Actions
+    
+    @objc private func dismissPopup() {
+        // Custom way to dismiss the modal, e.g., using dismiss or removing from parent
+        self.dismiss(animated: true, completion: nil)
+    }
+    
+    private func roundCorners(of view: UIView, corners: UIRectCorner, radius: CGFloat) {
+            let path = UIBezierPath(roundedRect: view.bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
+            let mask = CAShapeLayer()
+            mask.path = path.cgPath
+            view.layer.mask = mask
+        }
+}
+
+// MARK: - Table View Data Source and Delegate
+extension CountrySelectorPopupViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return countries.count
@@ -136,9 +152,6 @@ class CountrySelectorPopupViewController: UIViewController, UITableViewDataSourc
         
         // Highlight Singapore and check the selection state
         cell.configure(with: countryCode, isSelected: isSelected)
-        
-        // Remove selection highlight on tap
-        //cell.selectionStyle = .none
         
         return cell
     }
@@ -159,29 +172,4 @@ class CountrySelectorPopupViewController: UIViewController, UITableViewDataSourc
              self.dismissPopup()
         }
     }
-    
-    // MARK: - Actions
-    
-    @objc private func dismissPopup() {
-        // Custom way to dismiss the modal, e.g., using dismiss or removing from parent
-        self.dismiss(animated: true, completion: nil)
-    }
-    
-    private func roundCorners(of view: UIView, corners: UIRectCorner, radius: CGFloat) {
-            let path = UIBezierPath(roundedRect: view.bounds, byRoundingCorners: corners, cornerRadii: CGSize(width: radius, height: radius))
-            let mask = CAShapeLayer()
-            mask.path = path.cgPath
-            view.layer.mask = mask
-        }
 }
-
-
-
-/*
-// How to present this popup from another view controller:
-let popupVC = CountrySelectorPopupViewController()
-popupVC.modalPresentationStyle = .overFullScreen // Essential for modal transparency
-popupVC.modalTransitionStyle = .crossDissolve // Optional nice transition
-
-self.present(popupVC, animated: true, completion: nil)
-*/

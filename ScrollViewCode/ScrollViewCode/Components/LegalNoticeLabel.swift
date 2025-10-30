@@ -2,13 +2,11 @@
 //  LegalNoticeLabel.swift
 //  ScrollViewCode
 //
-//  Created by automated-refactor on 30/10/25.
+//  Created by sreekanth pulicherla on 30/10/25.
 //
 
 import UIKit
 
-/// A small helper UILabel subclass that configures the standard legal notice text
-/// with paragraph spacing, dynamic type and accessibility.
 class LegalNoticeLabel: UILabel {
 
     init(text: String? = nil) {

@@ -53,6 +53,11 @@ class CreateAccountViewController: UIViewController {
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
     }()
+
+    // Keep references to password fields and rules view so we can validate
+    private var passwordInputView: PasswordInputView?
+    private var confirmPasswordInputView: PasswordInputView?
+    private var passwordRulesView: PasswordRulesView?
     
     
     // MARK: - Lifecycle
@@ -69,6 +74,7 @@ class CreateAccountViewController: UIViewController {
     private func setupLayout() {
         // Add views to the hierarchy
         view.addSubview(scrollView)
+        // add bottom button to the view so it can be pinned to safe area when needed
         scrollView.addSubview(contentView)
         contentView.addSubview(formStackView)
         
@@ -96,6 +102,21 @@ class CreateAccountViewController: UIViewController {
             formStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
             formStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24)
         ])
+}
+
+    // MARK: - Layout adjustments
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateRegisterButtonVisibility()
+    }
+
+    private func updateRegisterButtonVisibility() {
+        // Simple check: if content size fits visible area, show bottom button and hide inline one.
+        let contentHeight = scrollView.contentSize.height
+        let available = view.safeAreaLayoutGuide.layoutFrame.height
+        let shouldUseBottom = contentHeight <= available
+
     }
     
     // MARK: - Content Population
@@ -114,18 +135,22 @@ class CreateAccountViewController: UIViewController {
         formStackView.addArrangedSubview(createMobileInputView())
 
         // 4. Password Inputs
-        let passwordInput = PasswordInputView(title: "Password", placeholder: "Pass@123")
-        passwordInput.visibilityButton.addTarget(self, action: #selector(toggleVisibility), for: .touchUpInside)
-        formStackView.addArrangedSubview(passwordInput)
-        
-        let confirmPasswordInput = PasswordInputView(title: "Confirm Password", placeholder: "********")
-        confirmPasswordInput.visibilityButton.addTarget(self, action: #selector(toggleVisibility), for: .touchUpInside)
-        formStackView.addArrangedSubview(confirmPasswordInput)
+    let passwordInput = PasswordInputView(title: "Password", placeholder: "Pass@123")
+    passwordInput.visibilityButton.addTarget(self, action: #selector(toggleVisibility), for: .touchUpInside)
+    formStackView.addArrangedSubview(passwordInput)
+    self.passwordInputView = passwordInput
+
+    let confirmPasswordInput = PasswordInputView(title: "Confirm Password", placeholder: "********")
+    confirmPasswordInput.visibilityButton.addTarget(self, action: #selector(toggleVisibility), for: .touchUpInside)
+    formStackView.addArrangedSubview(confirmPasswordInput)
+    self.confirmPasswordInputView = confirmPasswordInput
         
         formStackView.setCustomSpacing(25, after: formStackView.arrangedSubviews.last!)
 
-        // 5. Password Rules
-        formStackView.addArrangedSubview(createPasswordRulesView())
+    // 5. Password Rules
+    let rulesView = PasswordRulesView()
+    self.passwordRulesView = rulesView
+    formStackView.addArrangedSubview(rulesView)
         formStackView.setCustomSpacing(30, after: formStackView.arrangedSubviews.last!)
 
         // 6. Disclaimer/Checkbox
@@ -137,6 +162,13 @@ class CreateAccountViewController: UIViewController {
         
         // 8. Final Legal Text
         formStackView.addArrangedSubview(createFinalLegalText())
+
+        // Wire password field editing events to update rules
+        passwordInputView?.textField.addTarget(self, action: #selector(passwordFieldsChanged(_:)), for: .editingChanged)
+        confirmPasswordInputView?.textField.addTarget(self, action: #selector(passwordFieldsChanged(_:)), for: .editingChanged)
+
+        // Run initial validation pass
+        validatePasswordRules()
     }
     
     // MARK: - Helper View Factory Methods (for clarity)
@@ -182,8 +214,9 @@ class CreateAccountViewController: UIViewController {
     }
 
     private func createPasswordRulesView() -> UIView {
-        // Use the reusable PasswordRulesView component
+        // kept for compatibility; prefer the property-based rules view
         let rulesView = PasswordRulesView()
+        self.passwordRulesView = rulesView
         return rulesView
     }
 
@@ -219,6 +252,7 @@ class CreateAccountViewController: UIViewController {
         button.tintColor = .clear
         button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.addTarget(self, action: #selector(handleRegisterButtonTapped), for: .touchUpInside)
+        // keep a reference so other code can toggle/hide it
         return button
     }
     
@@ -245,5 +279,44 @@ class CreateAccountViewController: UIViewController {
         textField.isSecureTextEntry.toggle()
         let imageName = textField.isSecureTextEntry ? "eye.slash" : "eye"
         sender.setImage(UIImage(systemName: imageName), for: .normal)
+    }
+
+    // MARK: - Password validation wiring
+
+    @objc private func passwordFieldsChanged(_ sender: UITextField) {
+        validatePasswordRules()
+    }
+
+    private func validatePasswordRules() {
+        let pwd = passwordInputView?.textField.text ?? ""
+        let confirm = confirmPasswordInputView?.textField.text
+
+        // Rules in the same order as PasswordRulesView's default rules
+        var states: [Bool] = []
+
+        // 1. At least 8 characters
+        states.append(pwd.count >= 8)
+
+        // 2. One uppercase character
+        let hasUpper = pwd.range(of: "[A-Z]", options: .regularExpression) != nil
+        states.append(hasUpper)
+
+        // 3. One lowercase character
+        let hasLower = pwd.range(of: "[a-z]", options: .regularExpression) != nil
+        states.append(hasLower)
+
+        // 4. One number
+        let hasNumber = pwd.range(of: "[0-9]", options: .regularExpression) != nil
+        states.append(hasNumber)
+
+        // 5. Confirm password matches
+        let matches = (confirm != nil) && (confirm == pwd) && !pwd.isEmpty
+        states.append(matches)
+
+        passwordRulesView?.setCheckedStates(states)
+
+        // Optionally enable/disable register button(s)
+        let allOK = !(states.contains(false))
+   
     }
 }

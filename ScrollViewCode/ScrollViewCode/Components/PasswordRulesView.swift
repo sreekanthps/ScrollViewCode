@@ -2,21 +2,17 @@
 //  PasswordRulesView.swift
 //  ScrollViewCode
 //
-//  Created by automated-refactor on 30/10/25.
+//  Created by sreekanth pulicherla on 30/10/25.
 //
 
 import Foundation
 import UIKit
 
-/// A reusable view that displays password rules with checkmarks and exposes an API
-/// to mark rules as satisfied. Each rule row is accessible and supports Dynamic Type.
 class PasswordRulesView: UIView {
 
     // MARK: - Public API
-    /// The rules shown by the view (read-only).
     private(set) var rules: [String]
 
-    /// Current checked state for each rule.
     private(set) var checked: [Bool]
 
     // MARK: - Subviews

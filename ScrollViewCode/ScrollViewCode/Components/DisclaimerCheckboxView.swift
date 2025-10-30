@@ -2,14 +2,11 @@
 //  DisclaimerCheckboxView.swift
 //  ScrollViewCode
 //
-//  Created by automated-refactor on 30/10/25.
+//  Created by sreekanth pulicherla on 30/10/25.
 //
 
 import UIKit
 
-/// A reusable checkbox + attributed-text view used for disclaimers.
-/// The text contains two tappable links (Cardholders Agreement, Privacy Policy)
-/// and exposes callbacks for checkbox changes and link taps.
 class DisclaimerCheckboxView: UIView, UITextViewDelegate {
 
     // MARK: - Public
