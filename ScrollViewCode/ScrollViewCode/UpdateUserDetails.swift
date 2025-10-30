@@ -56,7 +56,7 @@ class UpdateUserDetails: UIViewController {
         label.text = "Account info"
         
         // Set the font to be large and bold, matching the image's style
-        label.font = UIFont.systemFont(ofSize: 24, weight: .regular)
+        label.font = UIFont.systemFont(ofSize: 24, weight: .medium)
         
         // Disable autoresizing masks to use Auto Layout constraints
         label.translatesAutoresizingMaskIntoConstraints = false
@@ -132,46 +132,33 @@ class UpdateUserDetails: UIViewController {
             addFormElements()
         }
         
-        private func createTextField(placeholder: String, keyboardType: UIKeyboardType = .default) -> UITextField {
-            let tf = UITextField()
-            tf.placeholder = placeholder
-            tf.borderStyle = .roundedRect
-            tf.keyboardType = keyboardType
-            // Set a minimum height constraint to ensure visibility
-            tf.heightAnchor.constraint(equalToConstant: 40).isActive = true
-            return tf
-        }
-        
-        private func createLabel(text: String) -> UILabel {
-            let label = UILabel()
-            label.text = text
-            label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-            return label
-        }
-
         private func addFormElements() {
             
             
             stackView.addArrangedSubview(accountInfoLabel)
             
-            let nameFieldStack = FullNameStackView(fullNameText: "Sreekath", subtitleText: "No work", placeholderText: "Using GPT")
+            let nameFieldStack = FullNameStackView(fullNameText: "Full name", subtitleText: "As it appears on your NRIC or Passport", placeholderText: "Full Name")
             nameFieldStack.translatesAutoresizingMaskIntoConstraints = false
             
             stackView.addArrangedSubview(nameFieldStack)
             
-            let nw2 = FirstNameStackView(fullNameText: "NRIC", placeholderText: "G3205842L")
+            // NRIC
+            let nw2 = FullNameStackView(fullNameText: "NRIC", placeholderText: "G3205842L")
             nw2.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(nw2)
             
-            let dob = FirstNameStackView(fullNameText: "Date of Birth", placeholderText: "Choose Date")
+            // Date of Birth
+            let dob = FullNameStackView(fullNameText: "Date of Birth", placeholderText: "Choose Date", textfieldinfo: "02/02/1989")
             nw2.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(dob)
             
-            let block = FirstNameStackView(fullNameText: "Block", placeholderText: "Block Here")
+            // Block
+            let block = FullNameStackView(fullNameText: "Block", placeholderText: "Block Here")
             nw2.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(nw2)
             
-            let street = FirstNameStackView(fullNameText: "street", placeholderText: "Street")
+            // Street
+            let street = FullNameStackView(fullNameText: "street", placeholderText: "Street")
             nw2.translatesAutoresizingMaskIntoConstraints = false
            
             horozantalstackView.addArrangedSubview(block)
@@ -186,12 +173,13 @@ class UpdateUserDetails: UIViewController {
             hstasck.spacing = 20 // Spacing between major sections/fields
             hstasck.translatesAutoresizingMaskIntoConstraints = false
             
-            
-            let floor = FirstNameStackView(fullNameText: "Floor", placeholderText: "Block Here")
+            // FLoor
+            let floor = FullNameStackView(fullNameText: "Floor", placeholderText: "Block Here")
             nw2.translatesAutoresizingMaskIntoConstraints = false
             
+            // Unit
             
-            let unit = FirstNameStackView(fullNameText: "street", placeholderText: "Street")
+            let unit = FullNameStackView(fullNameText: "street", placeholderText: "Street")
             nw2.translatesAutoresizingMaskIntoConstraints = false
            
             hstasck.addArrangedSubview(floor)
@@ -199,7 +187,8 @@ class UpdateUserDetails: UIViewController {
             
             stackView.addArrangedSubview(hstasck)
             
-            let bldgName = FirstNameStackView(fullNameText: "Building Name", placeholderText: "Building Name here...")
+            // Building Name here
+            let bldgName = FullNameStackView(fullNameText: "Building Name", placeholderText: "Building Name here...")
             bldgName.translatesAutoresizingMaskIntoConstraints = false
             stackView.addArrangedSubview(bldgName)
             
@@ -210,103 +199,21 @@ class UpdateUserDetails: UIViewController {
             hstasck2.spacing = 20 // Spacing between major sections/fields
             hstasck2.translatesAutoresizingMaskIntoConstraints = false
             
-            
-            let country = FirstNameStackView(fullNameText: "Country", placeholderText: "Country Name here")
+            // Country
+            let country = FullNameStackView(fullNameText: "Country", placeholderText: "Country Name here")
             nw2.translatesAutoresizingMaskIntoConstraints = false
             
-            
-            let pocode = FirstNameStackView(fullNameText: "Postal Code", placeholderText: "Country Name here")
+            // Country
+            let pocode = FullNameStackView(fullNameText: "Postal Code", placeholderText: "Country Name here")
             nw2.translatesAutoresizingMaskIntoConstraints = false
            
             hstasck2.addArrangedSubview(country)
             hstasck2.addArrangedSubview(pocode)
             
-            //stackView.addArrangedSubview(hstasck2)
-            
-            
-            //stackView.addArrangedSubview(spacer)
-            
-            let nameFieldStack1 = FullNameStackView(fullNameText: "Sreekath", subtitleText: "No work", placeholderText: "Using GPT")
-            nameFieldStack1.translatesAutoresizingMaskIntoConstraints = false
-            
-            //stackView.addArrangedSubview(nameFieldStack1)
-            
-            let nameFieldStack2 = FullNameStackView(fullNameText: "Sreekath", subtitleText: "No work", placeholderText: "Using GPT")
-            nameFieldStack2.translatesAutoresizingMaskIntoConstraints = false
-            
-            //stackView.addArrangedSubview(nameFieldStack2)
-            
             
             stackView.addArrangedSubview(proceedButton)
             
-//            // Full Name Section
-//            stackView.addArrangedSubview(createLabel(text: "Full Name"))
-//            stackView.addArrangedSubview(createTextField(placeholder: "Your full name here"))
-//            stackView.addArrangedSubview(createLabel(text: "As it appears on your NRIC or Passport"))
-//            
-//            // NRIC Section
-//            stackView.addArrangedSubview(createLabel(text: "NRIC"))
-//            stackView.addArrangedSubview(createTextField(placeholder: "E.G. S1233535A"))
-//            
-//            // Date of Birth Section
-//            stackView.addArrangedSubview(createLabel(text: "Date of Birth"))
-//            // Create custom view for Date of Birth field with calendar icon
-//            let dobContainer = createTextField(placeholder: "Choose date")
-//            dobContainer.rightViewMode = .always
-//            dobContainer.rightView = UIImageView(image: UIImage(systemName: "calendar"))
-//            stackView.addArrangedSubview(dobContainer)
-//
-//            // Address Fields (Horizontal Layouts)
-//            
-//            // Block & Street Row
-//            stackView.addArrangedSubview(createLabel(text: "Block / Street")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Block here..."),
-//                rightView: createTextField(placeholder: "Street name here...")
-//            ))
-//            
-//            // Floor & Unit Row
-//            stackView.addArrangedSubview(createLabel(text: "Floor / Unit")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Floor number here..."),
-//                rightView: createTextField(placeholder: "Unit here...")
-//            ))
-//            
-//            // Building Name
-//            stackView.addArrangedSubview(createLabel(text: "Building Name"))
-//            stackView.addArrangedSubview(createTextField(placeholder: "Building name here..."))
-//            
-//            // Country & Postal Code Row
-//            stackView.addArrangedSubview(createLabel(text: "Country / Postal Code")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Country name here..."),
-//                rightView: createTextField(placeholder: "Postal code here...", keyboardType: .numberPad)
-//            ))
-//            
-//            // Block & Street Row
-//            stackView.addArrangedSubview(createLabel(text: "Second Block / Street")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Block here..."),
-//                rightView: createTextField(placeholder: "Street name here...")
-//            ))
-//            
-//            // Floor & Unit Row
-//            stackView.addArrangedSubview(createLabel(text: "Floor / Unit")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Floor number here..."),
-//                rightView: createTextField(placeholder: "Unit here...")
-//            ))
-//            
-//            // Building Name
-//            stackView.addArrangedSubview(createLabel(text: "Building Name"))
-//            stackView.addArrangedSubview(createTextField(placeholder: "Building name here..."))
-//            
-//            // Country & Postal Code Row
-//            stackView.addArrangedSubview(createLabel(text: "Country / Postal Code")) // Combined label for the row
-//            stackView.addArrangedSubview(createHorizontalStack(
-//                leftView: createTextField(placeholder: "Country name here..."),
-//                rightView: createTextField(placeholder: "Postal code here...", keyboardType: .numberPad)
-//            ))
+
         }
         
         // Helper function for 50/50 horizontal split fields

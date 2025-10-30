@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         private func setupHomeViewController(_ launchOptions: [UIApplication.LaunchOptionsKey: Any]?) {
                 self.window = UIWindow(frame: UIScreen.main.bounds)
                 if let window = window {
-                    let mainVC =  CreateAccountViewController()//PinnedScrollViewControllerNew()// PinnedScrollViewController()//UpdateUserDetails()//StickyFooterFormViewController() //UpdateUserDetails() //UpdateUserDetails() //ExampleViewController() //
+                    let mainVC = UpdateUserDetails()//CreateAccountViewController()//PinnedScrollViewControllerNew()// PinnedScrollViewController()//UpdateUserDetails()//StickyFooterFormViewController() //UpdateUserDetails() //UpdateUserDetails() //ExampleViewController() //
                     navigationController = UINavigationController(rootViewController: mainVC)
                     window.rootViewController = navigationController
                     window.makeKeyAndVisible()

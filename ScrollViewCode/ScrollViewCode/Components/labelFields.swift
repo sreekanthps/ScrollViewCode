@@ -11,7 +11,6 @@ class FullNameStackView: UIView {
     
     // MARK: - Properties
         
-        // Expose the nameTextField publicly so its text can be accessed or modified
         private(set) var nameTextField: UITextField // Use private(set) for read-only access outside
         
         private let stackView: UIStackView = {
@@ -26,38 +25,57 @@ class FullNameStackView: UIView {
         
         private let fullNameLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .headline)
+            label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+            label.textColor = UIColor(hexString: "4D4D4D")
             return label
         }()
         
         private let subtitleLabel: UILabel = {
             let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .subheadline)
-            label.textColor = .secondaryLabel
+            label.font = UIFont.systemFont(ofSize: 14, weight: .regular)
+            label.textColor = UIColor(hexString: "4D4D4D")
             label.numberOfLines = 0
+            label.isHidden = true
             return label
         }()
+    
+    let textField: UITextField =  {
+        let textField = UITextField()
+        textField.layer.cornerRadius = 12
+        textField.layer.borderWidth = 1.0 / UIScreen.main.scale
+        textField.layer.borderColor = UIColor.systemGray4.cgColor
+        textField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 40))
+        textField.isUserInteractionEnabled = false
+        textField.leftViewMode = .always
+        textField.textColor = UIColor(hexString: "OE0E0E")
+        textField.heightAnchor.constraint(equalToConstant: 48).isActive = true
+        return  textField
+    }()
         
         // MARK: - Initialization (Constructor)
         
-        init(fullNameText: String, subtitleText: String, placeholderText: String) {
+    init(fullNameText: String, subtitleText: String? = nil, placeholderText: String, textfieldinfo: String? = nil) {
             
             // 1. Initialize the mutable text field property
-            let tf = UITextField()
-            tf.placeholder = placeholderText
-            tf.layer.cornerRadius = 12
-            tf.layer.borderWidth = 1.0 / UIScreen.main.scale
-            tf.layer.borderColor = UIColor.systemGray4.cgColor
-            tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 40))
-            tf.leftViewMode = .always
-            tf.heightAnchor.constraint(equalToConstant: 48).isActive = true
-            self.nameTextField = tf
+            
+            textField.placeholder = placeholderText
+            
+            // 2. Update textField property
+            if let _textFieldInfo = textfieldinfo {
+                textField.text = _textFieldInfo
+            }
+            self.nameTextField = textField
             
             super.init(frame: .zero) // Call designated initializer
             
             // 2. Set the text properties from constructor arguments
             self.fullNameLabel.text = fullNameText
             self.subtitleLabel.text = subtitleText
+            // hide subtitle if empty or nil
+            if let _subtitleText = subtitleText , !_subtitleText.isEmpty {
+                self.subtitleLabel.isHidden = false
+            }
+        
             
             // 3. Set up the layout
             setupStackView()
@@ -93,116 +111,28 @@ class FullNameStackView: UIView {
                 stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
             ])
         }
-}
 
-class FirstNameStackView: UIView {
-    
-    // MARK: - Properties
-        
-        // Expose the nameTextField publicly so its text can be accessed or modified
-        private(set) var nameTextField: UITextField // Use private(set) for read-only access outside
-        
-        private let stackView: UIStackView = {
-            let stack = UIStackView()
-            stack.axis = .vertical
-            stack.spacing = 6
-            stack.alignment = .fill
-            stack.distribution = .fill
-            stack.translatesAutoresizingMaskIntoConstraints = false
-            return stack
-        }()
-        
-        private let fullNameLabel: UILabel = {
-            let label = UILabel()
-            label.font = UIFont.preferredFont(forTextStyle: .headline)
-            return label
-        }()
-        
-        
-        // MARK: - Initialization (Constructor)
-        
-        init(fullNameText: String,placeholderText: String) {
-            
-            // 1. Initialize the mutable text field property
-            let tf = UITextField()
-            tf.placeholder = placeholderText
-            tf.layer.cornerRadius = 12
-            tf.layer.borderWidth = 1.0 / UIScreen.main.scale
-            tf.layer.borderColor = UIColor.systemGray4.cgColor
-            tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 40))
-            tf.leftViewMode = .always
-            tf.heightAnchor.constraint(equalToConstant: 48).isActive = true
-            self.nameTextField = tf
-            super.init(frame: .zero) // Call designated initializer
-            
-            // 2. Set the text properties from constructor arguments
-            self.fullNameLabel.text = fullNameText
-            
-            
-            // 3. Set up the layout
-            setupStackView()
+        // MARK: - Subtitle helpers
+
+        /// Set subtitle text. Pass `nil` or empty string to hide subtitle.
+        public func setSubtitle(_ text: String?) {
+            subtitleLabel.text = text
+            if let subtitlText = text, !subtitlText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                subtitleLabel.isHidden = false
+            } else {
+                subtitleLabel.isHidden = true
+            }
         }
-        
-        required init?(coder: NSCoder) {
-            // Fallback initialization for Interface Builder (though programmatic is assumed)
-            fatalError("init(coder:) has not been implemented for programmatic view.")
+
+        /// Show or hide the subtitle label without changing its text
+        public func showSubtitle(_ show: Bool) {
+            subtitleLabel.isHidden = !show
         }
-        
-        // MARK: - Public Update Method
-        
-        /// Updates the text field's content programmatically.
-        public func updateNameText(with newText: String) {
-            self.nameTextField.text = newText
-        }
-        
-        // MARK: - Setup
-        
-        private func setupStackView() {
-            addSubview(stackView)
-            
-            // Add components to the stack view
-            stackView.addArrangedSubview(fullNameLabel)
-            stackView.addArrangedSubview(nameTextField)
-            
-            // Pin the stack view to the custom view's edges
-            NSLayoutConstraint.activate([
-                stackView.topAnchor.constraint(equalTo: topAnchor),
-                stackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-                stackView.trailingAnchor.constraint(equalTo: trailingAnchor),
-                stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
-            ])
-        }
+
+        /// Returns whether subtitle is currently visible
+        public var isSubtitleVisible: Bool { !subtitleLabel.isHidden }
 }
 
 
 
-// MARK: - Example Usage in a View Controller
 
-class ExampleViewController: UIViewController {
-    
-    private let stackView = UIStackView()
-    private let scrollView = UIScrollView()
-    private let contentView = UIView()
-    
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .systemBackground
-        
-        let nameFieldStack = FullNameStackView(fullNameText: "Sreekath", subtitleText: "No work", placeholderText: "Using GPT")
-        nameFieldStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        let nw2 = FirstNameStackView(fullNameText: "NRIC", placeholderText: "G3205842L")
-        nameFieldStack.translatesAutoresizingMaskIntoConstraints = false
-       
-        
-        view.addSubview(nameFieldStack)
-        view.addSubview(nw2)
-        
-        NSLayoutConstraint.activate([
-            nameFieldStack.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            nameFieldStack.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
-            nameFieldStack.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24)
-        ])
-    }
-}

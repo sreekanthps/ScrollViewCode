@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 
-// MARK: - 2. MAIN VIEW CONTROLLER
+// MARK: - 1. MAIN VIEW CONTROLLER
 
 class CreateAccountViewController: UIViewController {
 
@@ -125,7 +125,7 @@ class CreateAccountViewController: UIViewController {
         formStackView.setCustomSpacing(25, after: formStackView.arrangedSubviews.last!)
 
         // 5. Password Rules
-    formStackView.addArrangedSubview(createPasswordRulesView())
+        formStackView.addArrangedSubview(createPasswordRulesView())
         formStackView.setCustomSpacing(30, after: formStackView.arrangedSubviews.last!)
 
         // 6. Disclaimer/Checkbox

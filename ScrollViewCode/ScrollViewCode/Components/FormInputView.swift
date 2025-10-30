@@ -31,7 +31,7 @@ class FormInputView: UIView {
         // Add left padding
         tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
         tf.leftViewMode = .always
-        tf.heightAnchor.constraint(equalToConstant: 41).isActive = true
+        tf.heightAnchor.constraint(equalToConstant: 48).isActive = true
         tf.translatesAutoresizingMaskIntoConstraints = false
         return tf
     }()
