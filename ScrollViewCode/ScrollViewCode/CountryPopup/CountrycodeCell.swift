@@ -49,27 +49,22 @@ class CountryCodeCell: UITableViewCell {
                 mainStack.axis = .horizontal
                 mainStack.spacing = 15
                 mainStack.alignment = .center
+                mainStack.distribution = .fill
                 mainStack.translatesAutoresizingMaskIntoConstraints = false
                 
-                // The main stack needs an empty spacer to push content to the left
-                let spacer = UIView()
-                spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
-                mainStack.insertArrangedSubview(spacer, at: 2)
+                // Set content priorities for proper stretching
+                flagLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+                nameAndCodeStack.setContentHuggingPriority(.defaultLow, for: .horizontal)
+                checkmark.setContentHuggingPriority(.defaultHigh, for: .horizontal)
                 
                 contentView.addSubview(mainStack)
                 
-                // 3. APPLY PADDING using Layout Margins
-                mainStack.isLayoutMarginsRelativeArrangement = true
-                // CRITICAL FIX: Add leading padding (e.g., 20 points)
-                mainStack.layoutMargins = UIEdgeInsets(top: 0, left: 20, bottom: 0, right: 20)
-                
-                // Pin mainStack to cell edges
+                // Pin mainStack to cell edges with proper padding
                 NSLayoutConstraint.activate([
                     mainStack.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
                     mainStack.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
-                    // Pin the stack's layout margin edges, not the stack itself, to the content view.
-                    mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-                    mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor)
+                    mainStack.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+                    mainStack.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
                 ])
     }
     

@@ -8,98 +8,6 @@
 import Foundation
 import UIKit
 
-// MARK: - 1. HELPER VIEWS DEFINITIONS
-
-// --- Base Class: FormInputView ---
-// Encapsulates a Title Label and a Styled Text Field.
-class FormInputView: UIView {
-    
-    // Components
-    let titleLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 16)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    let textField: UITextField = {
-        let tf = UITextField()
-        tf.borderStyle = .none
-        tf.layer.cornerRadius = 12.0
-        tf.layer.borderWidth = 1.0
-        tf.layer.borderColor = UIColor.systemGray4.cgColor
-        tf.backgroundColor = .white
-        
-        // Add left padding
-        tf.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 12, height: 0))
-        tf.leftViewMode = .always
-        tf.heightAnchor.constraint(equalToConstant: 48).isActive = true
-        tf.translatesAutoresizingMaskIntoConstraints = false
-        return tf
-    }()
-
-    init(title: String, placeholder: String, isSecure: Bool = false) {
-        super.init(frame: .zero)
-        
-        titleLabel.text = title
-        textField.placeholder = placeholder
-        textField.isSecureTextEntry = isSecure
-        
-        let stack = UIStackView(arrangedSubviews: [titleLabel, textField])
-        stack.axis = .vertical
-        stack.spacing = 8
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        
-        addSubview(stack)
-        
-        NSLayoutConstraint.activate([
-            stack.topAnchor.constraint(equalTo: topAnchor),
-            stack.leadingAnchor.constraint(equalTo: leadingAnchor),
-            stack.trailingAnchor.constraint(equalTo: trailingAnchor),
-            stack.bottomAnchor.constraint(equalTo: bottomAnchor)
-        ])
-    }
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
-
-// --- Specialized Class: PasswordInputView ---
-// Inherits from FormInputView and adds the eye icon for security toggle.
-class PasswordInputView: FormInputView {
-    
-    // Uses the same toggle function defined later in the main class
-    let visibilityButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setImage(UIImage(named: "eye_on"), for: .normal)
-        button.tintColor = .systemGray
-        button.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-        return button
-    }()
-    
-    
-    
-    init(title: String, placeholder: String) {
-        super.init(title: title, placeholder: placeholder, isSecure: true)
-        
-        // Set up the eye icon button as the right view
-        let containerView = UIView()
-        containerView.addSubview(visibilityButton)
-
-        NSLayoutConstraint.activate([
-            visibilityButton.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
-            visibilityButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -50), // inner margin
-            visibilityButton.widthAnchor.constraint(equalToConstant: 40),
-            visibilityButton.heightAnchor.constraint(equalToConstant: 40),
-            containerView.widthAnchor.constraint(equalToConstant: 40), // outer margin to textfield border
-            containerView.heightAnchor.constraint(equalToConstant: 40)
-        ])
-        
-        self.textField.rightView = containerView
-        self.textField.rightViewMode = .always
-    }
-    
-    required init?(coder: NSCoder) { fatalError("init(coder:) has not been implemented") }
-}
-
 
 // MARK: - 2. MAIN VIEW CONTROLLER
 
@@ -127,6 +35,25 @@ class CreateAccountViewController: UIViewController {
         stack.translatesAutoresizingMaskIntoConstraints = false
         return stack
     }()
+    
+    private let changeEmailButton: UIButton  = {
+        let button = UIButton(type: .system)
+        button.setTitle("Change Email", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        button.setTitleColor(UIColor(hexString: "003dA5"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
+    private let changeMobileButton: UIButton  = {
+        let button = UIButton(type: .system)
+        button.setTitle("Change Mobile", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
+        button.setTitleColor(UIColor(hexString: "003dA5"), for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        return button
+    }()
+    
     
     // MARK: - Lifecycle
 
@@ -174,9 +101,7 @@ class CreateAccountViewController: UIViewController {
     // MARK: - Content Population
     
     private func addContentToStack() {
-//        // 1. Back Button and Title
-//        let backButton = createBackButton()
-//        formStackView.addArrangedSubview(backButton)
+
         
         let titleLabel = createTitleLabel()
         formStackView.addArrangedSubview(titleLabel)
@@ -200,7 +125,7 @@ class CreateAccountViewController: UIViewController {
         formStackView.setCustomSpacing(25, after: formStackView.arrangedSubviews.last!)
 
         // 5. Password Rules
-        formStackView.addArrangedSubview(createPasswordRulesView())
+    formStackView.addArrangedSubview(createPasswordRulesView())
         formStackView.setCustomSpacing(30, after: formStackView.arrangedSubviews.last!)
 
         // 6. Disclaimer/Checkbox
@@ -231,56 +156,23 @@ class CreateAccountViewController: UIViewController {
         return label
     }
 
+    
     private func createEmailInputView() -> UIView {
-        let emailInput = FormInputView(title: "Email", placeholder: "ragvana@gmail.com")
-        let changeButton = UIButton(type: .system)
-        changeButton.setTitle("Change Email", for: .normal)
-        changeButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        changeButton.setTitleColor(UIColor(hexString: "003dA5"), for: .normal)
-        
-        emailInput.titleLabel.addSubview(changeButton)
-        
-        changeButton.translatesAutoresizingMaskIntoConstraints = false
+        let emailInput = FormInputView(title: "Email", placeholder: "abc@xyz.com")
+        emailInput.titleLabel.addSubview(changeEmailButton)
         NSLayoutConstraint.activate([
-            changeButton.centerYAnchor.constraint(equalTo: emailInput.titleLabel.centerYAnchor),
-            changeButton.trailingAnchor.constraint(equalTo: emailInput.titleLabel.trailingAnchor, constant: 0)
+            changeEmailButton.centerYAnchor.constraint(equalTo: emailInput.titleLabel.centerYAnchor),
+            changeEmailButton.trailingAnchor.constraint(equalTo: emailInput.titleLabel.trailingAnchor, constant: 0)
         ])
         return emailInput
     }
     
     private func createMobileInputView() -> UIView {
         let mobileStack = FormInputView(title: "Mobile Number", placeholder: "9876 5431")
-        
-        // Simplified flag and code UI integration
-        let prefixStack = UIStackView()
-        prefixStack.spacing = 4
-        prefixStack.alignment = .center
-        
-        let flag = UILabel()
-        flag.text = " 🇸🇬 +65 "
-        flag.textColor = UIColor(hexString: "8D8D8D")
-        flag.font = .systemFont(ofSize: 14, weight: .medium)
-        
-        let arrow = UIImageView(image: UIImage(systemName: "chevron.down"))
-        arrow.contentMode = .scaleAspectFit
-        arrow.widthAnchor.constraint(equalToConstant: 12).isActive = true
-
-        prefixStack.addArrangedSubview(flag)
-        prefixStack.addArrangedSubview(arrow)
-        prefixStack.isLayoutMarginsRelativeArrangement = true
-        prefixStack.layoutMargins = UIEdgeInsets(top: 0, left: 12, bottom: 0, right: 0)
-
-        mobileStack.textField.leftView = prefixStack
+        let country = CountryPrefixView()
+        mobileStack.textField.leftView = country
         mobileStack.textField.leftViewMode = .always
-        
-        // Change Mobile Button
-        let changeMobileButton = UIButton(type: .system)
-        changeMobileButton.setTitle("Change Mobile", for: .normal)
-        changeMobileButton.titleLabel?.font = .systemFont(ofSize: 14, weight: .medium)
-        changeMobileButton.setTitleColor(UIColor(hexString: "003dA5"), for: .normal)
         mobileStack.titleLabel.addSubview(changeMobileButton)
-        
-        changeMobileButton.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             changeMobileButton.centerYAnchor.constraint(equalTo: mobileStack.titleLabel.centerYAnchor),
             changeMobileButton.trailingAnchor.constraint(equalTo: mobileStack.titleLabel.trailingAnchor, constant: 0)
@@ -289,99 +181,31 @@ class CreateAccountViewController: UIViewController {
         return mobileStack
     }
 
-    private func createPasswordRulesView() -> UIStackView {
-        let rulesStack = UIStackView()
-        rulesStack.axis = .vertical
-        rulesStack.spacing = 8
-        rulesStack.alignment = .leading
-        
-        let title = UILabel()
-        title.text = "Your password must contain:"
-        title.font = .systemFont(ofSize: 15, weight: .semibold)
-        rulesStack.addArrangedSubview(title)
-        
-        let rules = [
-            "At least 8 alphanumeric characters",
-            "One uppercase character",
-            "One lowercase character",
-            "One number",
-            "Confirm new password matches"
-        ]
-        
-        for rule in rules {
-            let itemStack = UIStackView()
-            itemStack.spacing = 8
-            
-            let checkmark = UIImageView(image: UIImage(named: "check"))
-            checkmark.tintColor = .systemBlue
-            checkmark.widthAnchor.constraint(equalToConstant: 16).isActive = true
-            checkmark.heightAnchor.constraint(equalToConstant: 16).isActive = true
-            
-            let label = UILabel()
-            label.text = rule
-            label.font = .systemFont(ofSize: 14)
-            
-            itemStack.addArrangedSubview(checkmark)
-            itemStack.addArrangedSubview(label)
-            rulesStack.addArrangedSubview(itemStack)
-        }
-        
-        return rulesStack
+    private func createPasswordRulesView() -> UIView {
+        // Use the reusable PasswordRulesView component
+        let rulesView = PasswordRulesView()
+        return rulesView
     }
 
     private func createDisclaimerView() -> UIView {
-        let stack = UIStackView()
-        stack.axis = .vertical
-        stack.spacing = 16
-        
-        let checkboxContainer = UIStackView()
-        checkboxContainer.spacing = 8
-        
-        let checkbox = UIImageView(image: UIImage(systemName: "checkmark.square.fill"))
-        checkbox.tintColor = .systemBlue
-        
-        let button = UIButton(type: .custom)
-        button.setImage(UIImage(named: "checkbox"), for: .normal)
-        button.tintColor = .systemBlue
+        let view = DisclaimerCheckboxView()
 
-        // Set size (if you’re not using Auto Layout)
-        button.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        button.imageView?.contentMode = .scaleAspectFit
-        
-        let textLabel = UILabel()
-        textLabel.numberOfLines = 0
-        textLabel.font = .systemFont(ofSize: 14)
-        
-        // Attributed text for links
-        let fullText = "I confirm that I have read, understood and accept NETS for Cardholders Agreement and Privacy Policy"
-        let attributedString = NSMutableAttributedString(string: fullText)
-        
-        let linkAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor(hexString: "003dA5"),
-            .font: UIFont.systemFont(ofSize: 14, weight: .semibold)
-        ]
-        
-        let paragraphStyle = NSMutableParagraphStyle()
-                
-                // 3. Set the desired line spacing value
-                paragraphStyle.lineSpacing = 5
-        // Apply link styling to specific words
-        
-        attributedString.addAttributes(linkAttributes, range: (fullText as NSString).range(of: "Cardholders Agreement"))
-        attributedString.addAttributes(linkAttributes, range: (fullText as NSString).range(of: "Privacy Policy"))
-        attributedString.addAttribute(
-                    .paragraphStyle,
-                    value: paragraphStyle,
-                    range: NSRange(location: 0, length: attributedString.length)
-                )
-        
-        textLabel.attributedText = attributedString
-        
-        checkboxContainer.addArrangedSubview(button)
-        checkboxContainer.addArrangedSubview(textLabel)
-        stack.addArrangedSubview(checkboxContainer)
-        
-        return stack
+        // Example: handle link taps
+        view.onLinkTapped = { id in
+            if id == "agreement" {
+                // present agreement
+                print("Cardholders Agreement tapped")
+            } else if id == "privacy" {
+                print("Privacy Policy tapped")
+            }
+        }
+
+        // Example: track checkbox state
+        view.onCheckChanged = { checked in
+            print("Disclaimer checked: \(checked)")
+        }
+
+        return view
     }
     
     private func createRegisterButton() -> UIButton {
@@ -406,36 +230,9 @@ class CreateAccountViewController: UIViewController {
     }
     
     private func createFinalLegalText() -> UILabel {
-        let label = UILabel()
-        label.numberOfLines = 0
-        label.font = .systemFont(ofSize: 12)
-        //label.textColor = UIColor(hexString: "666666")
-        let linkAttributes: [NSAttributedString.Key: Any] = [
-            .foregroundColor: UIColor(hexString: "666666"),
-            .font: UIFont.systemFont(ofSize: 12, weight: .regular)
-        ]
-        
-        // 1. Create a mutable attributed string with the text
-        let attributedString = NSMutableAttributedString(string: "The collection, use, disclosure and sharing of this information, which to the best of my knowledge and belief is true and accurate for purposes reasonably required to process my submission which are set out in NETS' Data protection policy.", attributes: linkAttributes)
-                
-                // 2. Create the paragraph style object
-                let paragraphStyle = NSMutableParagraphStyle()
-                
-                // 3. Set the desired line spacing value
-                paragraphStyle.lineSpacing = 4
-        
-        attributedString.addAttribute(
-                    .paragraphStyle,
-                    value: paragraphStyle,
-                    range: NSRange(location: 0, length: attributedString.length)
-                )
-        label.attributedText = attributedString
-       
-        return label
-        
+        return LegalNoticeLabel()
         
     }
-
     // MARK: - Actions
     
     @objc private func toggleVisibility(_ sender: UIButton) {
