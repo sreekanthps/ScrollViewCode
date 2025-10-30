@@ -94,7 +94,7 @@ class PasswordRulesView: UIView {
         itemStack.spacing = 8
         itemStack.translatesAutoresizingMaskIntoConstraints = false
 
-        let check = UIImageView(image: UIImage(named: "check"))
+        let check = UIImageView(image: UIImage(named: "uncheck"))
         check.tintColor = .systemBlue
         check.contentMode = .scaleAspectFit
         check.translatesAutoresizingMaskIntoConstraints = false
@@ -129,8 +129,8 @@ class PasswordRulesView: UIView {
     func setChecked(_ index: Int, _ value: Bool, animated: Bool = false) {
         guard index >= 0, index < checkmarks.count else { return }
         checked[index] = value
-        let imageName = value ? "checkmark.circle.fill" : "circle"
-        let image = UIImage(systemName: imageName)
+        let imageName = value ? "check" : "uncheck"
+        let image = UIImage(named: imageName)
         let check = checkmarks[index]
         if animated {
             UIView.transition(with: check, duration: 0.18, options: .transitionCrossDissolve, animations: {

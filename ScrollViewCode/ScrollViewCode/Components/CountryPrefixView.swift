@@ -18,7 +18,7 @@ class CountryPrefixView: UIView {
     }()
     
      private let arrow: UIImageView = {
-        let image = UIImageView(image: UIImage(systemName: "chevron.down"))
+        let image = UIImageView(image: UIImage(named: "chevron"))
          image.contentMode = .scaleAspectFit
          image.widthAnchor.constraint(equalToConstant: 12).isActive = true
          return image
