@@ -18,16 +18,13 @@ class UpdateUserDetails: UIViewController {
         private let scrollView: UIScrollView = {
             let sv = UIScrollView()
             sv.translatesAutoresizingMaskIntoConstraints = false
-            // Ensure the content size adjusts dynamically
-            //sv.alwaysScrollsVertical = true
-            return sv
+             return sv
         }()
         
         // 2. Content View (A plain view inside the ScrollView to hold all form fields)
         private let contentView: UIView = {
             let view = UIView()
             view.translatesAutoresizingMaskIntoConstraints = false
-            //view.backgroundColor = .yellow
             return view
         }()
         
@@ -39,6 +36,24 @@ class UpdateUserDetails: UIViewController {
             stack.translatesAutoresizingMaskIntoConstraints = false
             return stack
         }()
+
+    // Reference to inline proceed button (inside the stack)
+    private var inlineProceedButton: UIButton?
+
+    // External bottom-anchored proceed button (shown only when content fits)
+    private lazy var bottomProceedButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.setTitle("Proceed", for: .normal)
+        button.titleLabel?.font = .systemFont(ofSize: 20, weight: .semibold)
+        button.backgroundColor = UIColor(red: 0.1, green: 0.2, blue: 0.8, alpha: 1.0)
+        button.setTitleColor(.white, for: .normal)
+        button.layer.cornerRadius = 12
+        button.translatesAutoresizingMaskIntoConstraints = false
+        button.heightAnchor.constraint(equalToConstant: 44).isActive = true
+        button.addTarget(self, action: #selector(handleProceedTap), for: .touchUpInside)
+        button.isHidden = true
+        return button
+    }()
     
         // 3. Form Elements (Using a StackView for organized vertical layout)
         private let horozantalstackView: UIStackView = {
@@ -97,6 +112,8 @@ class UpdateUserDetails: UIViewController {
         
         private func setupLayout() {
             view.addSubview(scrollView)
+            // Add external bottom proceed button so it can be pinned to safe area when needed
+            view.addSubview(bottomProceedButton)
             scrollView.addSubview(contentView)
             contentView.addSubview(stackView)
             
@@ -127,6 +144,13 @@ class UpdateUserDetails: UIViewController {
                 stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 24),
                 stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -24)
             ])
+
+            // Bottom proceed button constraints (anchored to safe area)
+            NSLayoutConstraint.activate([
+                bottomProceedButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 24),
+                bottomProceedButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -24),
+                bottomProceedButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16)
+            ])
             
             // 4. Add Form Elements to the StackView
             addFormElements()
@@ -136,6 +160,8 @@ class UpdateUserDetails: UIViewController {
             
             
             stackView.addArrangedSubview(accountInfoLabel)
+            
+            stackView.setCustomSpacing(20, after: accountInfoLabel)
             
             let nameFieldStack = FullNameStackView(fullNameText: "Full name", subtitleText: "As it appears on your NRIC or Passport", placeholderText: "Full Name")
             nameFieldStack.translatesAutoresizingMaskIntoConstraints = false
@@ -212,23 +238,71 @@ class UpdateUserDetails: UIViewController {
             
             
             stackView.addArrangedSubview(proceedButton)
-            
+            // Keep reference to the inline proceed button so we can toggle visibility
+            inlineProceedButton = proceedButton
+        }
 
+    // MARK: - Layout adjustments
+
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        updateProceedButtonVisibility()
+    }
+
+    private func updateProceedButtonVisibility() {
+        // available height inside the safe area
+        let availableHeight = view.safeAreaLayoutGuide.layoutFrame.height
+
+        // compute total height of stack content excluding the inline proceed button
+        func contentHeightExcludingInline() -> CGFloat {
+            contentView.layoutIfNeeded()
+
+            var stackWidth = stackView.bounds.width
+            if stackWidth <= 0 {
+                stackWidth = max(0, contentView.bounds.width - 48)
+            }
+
+            let arranged = stackView.arrangedSubviews.filter { $0 !== inlineProceedButton }
+            var total: CGFloat = 0
+
+            for viewItem in arranged {
+                let targetSize = CGSize(width: stackWidth, height: UIView.layoutFittingCompressedSize.height)
+                let size = viewItem.systemLayoutSizeFitting(targetSize,
+                                                            withHorizontalFittingPriority: .required,
+                                                            verticalFittingPriority: .fittingSizeLevel)
+                total += size.height
+            }
+
+            if arranged.count > 1 {
+                total += CGFloat(arranged.count - 1) * stackView.spacing
+            }
+
+            total += 24 + 24 // top & bottom padding applied to stack
+            return total
         }
-        
-        // Helper function for 50/50 horizontal split fields
-        private func createHorizontalStack(leftView: UIView, rightView: UIView) -> UIStackView {
-            let stack = UIStackView(arrangedSubviews: [leftView, rightView])
-            stack.axis = .horizontal
-            stack.spacing = 16
-            stack.distribution = .fillEqually
-            return stack
-        }
-        
-        @objc func handleProceedTap() {
-            print("Proceed button was tapped!")
-            // Add navigation or action logic here
-        }
-        
+
+        let formContentHeight = contentHeightExcludingInline()
+        let bottomButtonTotal: CGFloat = 44 + 16
+
+        let shouldUseBottom = (formContentHeight + bottomButtonTotal) <= availableHeight
+
+        inlineProceedButton?.isHidden = shouldUseBottom
+        bottomProceedButton.isHidden = !shouldUseBottom
+    }
+
+    // Helper function for 50/50 horizontal split fields
+    private func createHorizontalStack(leftView: UIView, rightView: UIView) -> UIStackView {
+        let stack = UIStackView(arrangedSubviews: [leftView, rightView])
+        stack.axis = .horizontal
+        stack.spacing = 16
+        stack.distribution = .fillEqually
+        return stack
+    }
+
+    @objc func handleProceedTap() {
+        print("Proceed button was tapped!")
+        // Add navigation or action logic here
+    }
+
 }
 
